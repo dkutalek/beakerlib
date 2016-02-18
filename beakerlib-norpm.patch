@@ -1,0 +1,76 @@
+diff --git a/src/python/journalling.py b/src/python/journalling.py
+index 324a3ad..a290df6 100755
+--- a/src/python/journalling.py
++++ b/src/python/journalling.py
+@@ -28,7 +28,7 @@ import sys
+ import os
+ import time
+ import re
+-import rpm
++#import rpm
+ import socket
+ import types
+ 
+@@ -316,6 +316,8 @@ class Journal(object):
+ 
+   #@staticmethod
+   def getRpmVersion(xmldoc, package, rpm_ts):
++    if not rpm_ts:
++      return None
+     rpms = []
+     mi = rpm_ts.dbMatch("name", package)
+     if len(mi) == 0:
+@@ -352,7 +354,8 @@ class Journal(object):
+         if p not in pkgnames:
+           pkgnames.append(p)
+ 
+-    ts = rpm.ts()
++    # ts = rpm.ts()
++    ts = None
+     for pkgname in pkgnames:
+       rpmVersions = Journal.getRpmVersion(xmldoc, pkgname, ts)
+       if rpmVersions:
+@@ -382,8 +385,10 @@ class Journal(object):
+       package = "unknown"
+     packageCon = newdoc.createTextNode(str(package))
+ 
+-    ts = rpm.ts()
+-    mi = ts.dbMatch("name", "beakerlib")
++    # ts = rpm.ts()
++    # mi = ts.dbMatch("name", "beakerlib")
++    ts = None
++    mi = None
+     beakerlibRpmEl = newdoc.createElement("beakerlib_rpm")
+     if mi:
+       beakerlib_rpm = mi.next()
+@@ -391,7 +396,7 @@ class Journal(object):
+     else:
+       beakerlibRpmCon = newdoc.createTextNode("not installed")
+ 
+-    mi = ts.dbMatch("name", "beakerlib-redhat")
++    # mi = ts.dbMatch("name", "beakerlib-redhat")
+     beakerlibRedhatRpmEl = newdoc.createElement("beakerlib_redhat_rpm")
+     if mi:
+       beakerlib_redhat_rpm = mi.next()
+@@ -707,13 +712,15 @@ class Journal(object):
+     jrnl = Journal.openJournal()
+     log = Journal.getLogEl(jrnl)
+     add_to = Journal.getLastUnfinishedPhase(log)
+-    ts = rpm.ts()
++    # ts = rpm.ts()
++    ts = None
+     rpms = Journal.getRpmVersion(jrnl, package, ts)
+-    for pkg in rpms:
+-      pkgEl,pkgCon = pkg
+-      pkgEl.appendChild(pkgCon)
+-      add_to.appendChild(pkgEl)
+-    return Journal.saveJournal(jrnl)
++    if rpms:
++      for pkg in rpms:
++        pkgEl,pkgCon = pkg
++        pkgEl.appendChild(pkgCon)
++        add_to.appendChild(pkgEl)
++      return Journal.saveJournal(jrnl)
+ 
+   logRpmVersion = staticmethod(logRpmVersion)
+ 
