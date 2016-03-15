@@ -1,0 +1,13 @@
+--- ./beakerlib-o/Makefile	2016-02-18 19:00:31.411146490 +0100
++++ ./beakerlib-m/beakerlib-1.11/Makefile	2016-03-15 11:31:34.642967459 +0100
+@@ -12,7 +12,9 @@
+ 	export PKGDOCDIR := /usr/share/doc/$(PKGNAME)/
+ endif
+ 
+-export DESTDIR := $(shell readlink -f -n $(DD))
++ifndef DESTDIR
++	export DESTDIR := $(shell readlink -f -n $(DD))
++endif
+ 
+ SUBDIRS := src
+ 
